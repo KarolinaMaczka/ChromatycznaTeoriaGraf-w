@@ -1,3 +1,4 @@
+import networkx as nx
 from matplotlib import pyplot as plt
 from matplotlib.patches import Circle as pltCircle
 
@@ -8,9 +9,18 @@ from graph.Vertex import Vertex
 
 
 class IntersectionGraph(Graph):
+
     @staticmethod
     def get_intersection_graph(p_list_of_circles):
+        """
+            Initializes intersection graph from list of circles.
+
+        :param p_list_of_circles: list of circles needed to initialize a graph
+        :return: an intersection graph
+        """
+        global max_radius
         assert isinstance(p_list_of_circles, list)
+
         for circle in p_list_of_circles:
             assert isinstance(circle, Circle)
 
@@ -35,6 +45,11 @@ class IntersectionGraph(Graph):
         return res
 
     def plot_circles(self):
+        """
+            Plots circles which were used to initialize a graph.
+
+        :return: subplots
+        """
         fig, ax = plt.subplots()
         ax.set_xlim(RANGE_FROM - RADIUS - 1, RANGE_TO + RADIUS + 1)
         ax.set_ylim(RANGE_FROM - RADIUS - 1, RANGE_TO + RADIUS + 1)
@@ -45,12 +60,16 @@ class IntersectionGraph(Graph):
         ax.set_aspect('equal')
         plt.show()
 
-        return
+        return fig, ax
 
     def plot_circle_intersection_graph(self):
+        """
+            Plots graph with colours.
+            The graph needs to be previously coloured.
+
+        :return: subplots
+        """
         fig, ax = plt.subplots()
-        ax.set_xlim(RANGE_FROM - RADIUS - 1, RANGE_TO + RADIUS + 1)
-        ax.set_ylim(RANGE_FROM - RADIUS - 1, RANGE_TO + RADIUS + 1)
 
         for vertex in self.vertices:
             ax.add_artist(pltCircle((vertex.info.pos_x, vertex.info.pos_y), vertex.info.radius, fill=False))
@@ -62,17 +81,20 @@ class IntersectionGraph(Graph):
                     "-k")
 
         ax.set_aspect('equal')
-        plt.show()
 
-        return
+        return fig, ax
 
     def colour_disc_graph(self):
+        """
+            Colours graph with First Fit algorithm.
+        """
         sor = [el[0] for el in sorted(enumerate(self.vertices), key=lambda x: x[1].info.pos_x)]
         self.colour_greed(sor)
 
         return
 
     def colour_greed(self, p_order):
+        """Colours graph with greedy algorithm"""
         colours = set(i for i in range(self.Delta + 1))
 
         for i in p_order:
@@ -81,6 +103,12 @@ class IntersectionGraph(Graph):
         pass
 
     def _colour_vertex(self, p_vertex, p_set_of_colours):
+        """
+            Colours given vertex with first available colour.
+
+        :param p_vertex: Vertex which is to be coloured.
+        :param p_set_of_colours: Set of all colours (not only available)
+        """
         neighbours_colours = set()
 
         for edge in self._edges:
@@ -98,6 +126,11 @@ class IntersectionGraph(Graph):
         return
 
     def used_colours_set(self):
+        """
+            Finds all the already used colours.
+
+        :return: List of all the already used colours.
+        """
         result = set()
 
         for vertex in self._vertices:
@@ -106,7 +139,30 @@ class IntersectionGraph(Graph):
         return result
 
     def pseudo_chi(self):
+        """
+            Finds the number of already used colours. If used after final colouring it returns the number of colours
+        used in the colouring of the graph.
+
+        :return: Number of used colours.
+        """
         return len(self.used_colours_set())
+
+    def get_Delta(self):
+        return self.Delta
+
+    def biggest_clique(self):
+        """
+        Finds the size of the biggest clique in the graph.
+
+        :return: The size of the biggest clique in the graph.
+        """
+        G = nx.Graph()
+        for edge in self.edges:
+            G.add_edge(edge['v1'], edge['v2'])
+        cliques = list(nx.find_cliques(G))
+        largest_clique = max(cliques, key=len)
+        size_of_largest_clique = len(largest_clique)
+        return size_of_largest_clique
 
     def __repr__(self):
         result = super().__repr__()
