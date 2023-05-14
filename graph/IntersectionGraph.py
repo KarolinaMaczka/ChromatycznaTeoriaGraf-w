@@ -65,7 +65,7 @@ class IntersectionGraph(Graph):
     def plot_circle_intersection_graph(self):
         """
             Plots graph with colours.
-            The graph needs to be previously coloured.
+        The graph needs to be previously coloured.
 
         :return: subplots
         """
@@ -79,6 +79,9 @@ class IntersectionGraph(Graph):
             ax.plot([self.vertices[edge["v1"]].info.pos_x, self.vertices[edge["v2"]].info.pos_x],
                     [self.vertices[edge["v1"]].info.pos_y, self.vertices[edge["v2"]].info.pos_y],
                     "-k")
+
+        ax.set_xlim(RANGE_FROM - RADIUS - 1, RANGE_TO + RADIUS + 1)
+        ax.set_ylim(RANGE_FROM - RADIUS - 1, RANGE_TO + RADIUS + 1)
 
         ax.set_aspect('equal')
 
