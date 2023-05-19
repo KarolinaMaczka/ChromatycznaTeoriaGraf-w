@@ -63,21 +63,48 @@ def colouring_test(max_radius, max_num_circles, num_graph, max_range=None):
         fig, ax = graphs[i].plot_circle_intersection_graph()
         # changing default dimensions of a plot
         if max_range is None:
-            ax.set_xlim(0 - max_radius, max_radius * 6)
-            ax.set_ylim(0 - max_radius, max_radius * 6)
+            ax.set_xlim(0 - max_radius*2, max_radius * 6)
+            ax.set_ylim(0 - max_radius*2, max_radius * 6)
         else:
-            ax.set_xlim(0 - max_radius, max_range + max_radius)
-            ax.set_ylim(0 - max_radius, max_range + max_radius)
+            ax.set_xlim(0 - max_radius*2, max_range + max_radius)
+            ax.set_ylim(0 - max_radius*2, max_range + max_radius)
 
         fig.savefig(
             f"./figures/graph_{max_radius_str}_{i}")  # saving graph to file, first max radius value and second number of graph
 
         properties.append([graphs[i].pseudo_chi(), graphs[i].get_Delta() + 1, graphs[i].biggest_clique(),
-                           3 * graphs[i].biggest_clique() - 2])
-        df = pd.DataFrame(properties, columns=['chi', 'Delta+1', 'size of biggest clique (omega)', '3*omega-2'])
+                           3 * graphs[i].biggest_clique() - 2, 6 * graphs[i].biggest_clique() - 6])
+        df = pd.DataFrame(properties, columns=['chi', 'Delta+1', 'size of biggest clique (omega)', '3*omega-2', '6*omega-6'])
         df.to_excel(f'./dataframes/dataframe_{max_radius_str}.xlsx', index=False)  # saving our test data
 
     return df
+
+def find_limits(list_of_circles):
+    """
+        Finds suitable limits of x and y axes for ploting graph.
+
+    :param list_of_circles: List of Circle objects
+    :return: tuple of maximum and minimum values of x and y axes
+    """
+    max_x = 0
+    max_y = 0
+    min_x = 0
+    min_y = 0
+    max_rad = 0
+    for c in list_of_circles:
+        max_x = c.pos_x if c.pos_x > max_x else max_x
+        min_x = c.pos_x if c.pos_x < min_x else min_x
+        max_y = c.pos_y if c.pos_y > max_y else max_y
+        min_y = c.pos_y if c.pos_y < min_y else min_y
+        max_rad = c.radius if c.radius > max_rad else max_rad
+
+    return max_x + max_rad*1.5, max_y + max_rad*1.5, min_x-max_rad*1.5, min_y-max_rad*1.5
+
+# def test_find_limits():
+#     list_of_circles = [Circle(0,0,1), Circle(2,1, 2)]
+#     expected_result = (5, 4, -3, -3)
+#     actual_result = find_limits(list_of_circles)
+#     return actual_result == expected_result
 
 
 def colouring_list_test(list_of_circles, filename):
@@ -94,13 +121,13 @@ def colouring_list_test(list_of_circles, filename):
     g = IntersectionGraph.get_intersection_graph(list_of_circles)
     g.colour_disc_graph()
     fig, ax = g.plot_circle_intersection_graph()
-    radius = list_of_circles[0].radius
-    ax.set_xlim(0 - radius*3, radius * 6)
-    ax.set_ylim(0 - radius*3, radius * 6)
+    max_x, max_y , min_x, min_y = find_limits(list_of_circles)
+    ax.set_xlim(min_x,  max_x)
+    ax.set_ylim(min_y, max_y)
     fig.savefig(f'./figures/{filename}')
     properties = [[g.pseudo_chi(), g.get_Delta() + 1, g.biggest_clique(),
-                       3 * g.biggest_clique() - 2]]
-    df = pd.DataFrame(properties, columns=['chi', 'Delta+1', 'size of biggest clique (omega)', '3*omega-2'])
+                       3 * g.biggest_clique() - 2, 6 * g.biggest_clique() - 6]]
+    df = pd.DataFrame(properties, columns=['chi', 'Delta+1', 'size of biggest clique (omega)', '3*omega-2', '6*omega-6'])
     df.to_excel(f'./dataframes/{filename}.xlsx', index=False)
 
     return df
@@ -125,8 +152,9 @@ def main():
                Circle(2.75, 0, 1), Circle(4, 1, 1), Circle(4, -1, 1)]
     print(colouring_list_test(test_03, 'test_03'))
 
-
-
+    # test 04
+    test_04 = [Circle(0, 0, 0.5), Circle(0.5, 0, 0.7), Circle(0.75, 1.25, 1), Circle(0.75, -1.25, 1), Circle(2.75, 1.25, 1.5), Circle(2.75, -1.25, 1.5), Circle(2, 0, 0.3), Circle(3.5, 0, 0.3)]
+    print(colouring_list_test(test_04, 'test_04'))
 
 if __name__ == '__main__':
     main()
