@@ -11,6 +11,12 @@ class Circle:
         return
 
     def intersects_with(self, p_other):
+        """
+            Decides whether two circles intersect.
+
+        :param p_other: Another circle.
+        :return: Boolean: Does given circles intersect?
+        """
         assert isinstance(p_other, Circle)
 
         distance = ((self._pos_x - p_other._pos_x) ** 2 + (self._pos_y - p_other._pos_y) ** 2) ** 0.5
