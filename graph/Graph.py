@@ -34,6 +34,9 @@ class Graph:
         return self._delta
 
     def _calculate_degrees(self):
+        """
+            Calculates degrees of every vertex in the graph and updates them.
+        """
         for edge in self._edges:
             self._vertices[edge["v1"]].deg += 1
             self._vertices[edge["v2"]].deg += 1
@@ -41,6 +44,9 @@ class Graph:
         return
 
     def _refresh_deltas(self):
+        """
+        Refreshes Delta and delta properties of the graph.
+        """
         if len(self._vertices) == 0:
             return
 
